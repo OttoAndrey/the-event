@@ -1,25 +1,20 @@
 from rest_framework.decorators import api_view
-from rest_framework.exceptions import ValidationError
+from rest_framework.fields import CharField
 from rest_framework.response import Response
+from rest_framework.serializers import Serializer
 
 from .models import Application, Participant
 
 
-def validate(data):
-    errors = []
-    if 'contact_phone' not in data:
-        errors.append('Contact phone field is required.')
-
-    if 'ticket_type' not in data:
-        errors.append('Ticket type field is required.')
-
-    if errors:
-        raise ValidationError(errors)
+class ApplicationSerializer(Serializer):
+    contact_phone = CharField()
+    ticket_type = CharField()
 
 
 @api_view(['POST'])
 def enroll(request):
-    validate(request.data)
+    serializer = ApplicationSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
     # TODO check if ticket_type is one of available choices
 
     participants = request.data.get('participants', [])  # TODO validate data!
