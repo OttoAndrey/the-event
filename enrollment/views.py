@@ -1,4 +1,5 @@
 from rest_framework.decorators import api_view
+from rest_framework.exceptions import ValidationError
 from rest_framework.fields import CharField
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
@@ -10,12 +11,16 @@ class ApplicationSerializer(Serializer):
     contact_phone = CharField()
     ticket_type = CharField()
 
+    def validate_ticket_type(self, value):
+        if value not in ['standard-access', 'pro-access', 'premium-access']:
+            raise ValidationError('Wrong value!')
+        return value
+
 
 @api_view(['POST'])
 def enroll(request):
     serializer = ApplicationSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    # TODO check if ticket_type is one of available choices
 
     participants = request.data.get('participants', [])  # TODO validate data!
 
