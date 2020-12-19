@@ -1,20 +1,14 @@
 from rest_framework.decorators import api_view
-from rest_framework.exceptions import ValidationError
-from rest_framework.fields import CharField
 from rest_framework.response import Response
-from rest_framework.serializers import Serializer
+from rest_framework.serializers import ModelSerializer
 
 from .models import Application, Participant
 
 
-class ApplicationSerializer(Serializer):
-    contact_phone = CharField()
-    ticket_type = CharField()
-
-    def validate_ticket_type(self, value):
-        if value not in ['standard-access', 'pro-access', 'premium-access']:
-            raise ValidationError('Wrong value!')
-        return value
+class ApplicationSerializer(ModelSerializer):
+    class Meta:
+        model = Application
+        fields = ['contact_phone', 'ticket_type']
 
 
 @api_view(['POST'])
