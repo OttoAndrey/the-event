@@ -25,14 +25,13 @@ def enroll(request):
     serializer = ApplicationSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
-    participants = request.data.get('participants', [])
-
     application = Application.objects.create(
         contact_phone=str(request.data['contact_phone']),
         ticket_type=str(request.data['ticket_type']),
     )
 
-    participants = [Participant(application=application, **fields) for fields in participants]
+    participant_fields = serializer.validated_data['participants']
+    participants = [Participant(application=application, **fields) for fields in participant_fields]
     Participant.objects.bulk_create(participants)
 
     return Response({
